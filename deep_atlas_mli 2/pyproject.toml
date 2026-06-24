@@ -1,0 +1,40 @@
+[project]
+name = "deep-atlas-mli"
+version = "0.1.0"
+description = "Deep Atlas MLI Coursework"
+requires-python = ">=3.11"
+dependencies = [
+    "datasets>=4.1.1",
+    "faiss-cpu>=1.12.0",
+    "flask>=3.1.1",
+    "flask-cors>=6.0.1",
+    "gradio>=5.35.0",
+    "ipykernel>=6.29.5",
+    "ipywidgets>=8.1.7",
+    "langchain>=0.3.25",
+    "langchain-community>=0.3.25",
+    "langchain-openai>=0.3.24",
+    "llvmlite>=0.43.0",
+    "matplotlib>=3.9.0",
+    "nltk>=3.9.1",
+    "numpy>=1.24.0",
+    "ollama>=0.5.1",
+    "onnxmltools>=1.14.0",
+    "openai>=1.107.2",
+    "openpyxl>=3.1.5",
+    "pandas>=2.3.0",
+    "peft>=0.17.1",
+    "pinecone-client>=6.0.0",
+    "psycopg2-binary>=2.9.10",
+    "python-dotenv>=1.1.1",
+    "scikit-learn>=1.7.0",
+    "sentence-transformers>=5.0.0",
+    "skl2onnx>=1.19.1",
+    "torch>=2.7.1",
+    "torchinfo>=1.8.0",
+    "torchvision>=0.22.1",
+    "transformers>=4.56.1",
+    "umap-learn>=0.5.9.post2",
+    "wandb>=0.21.0",
+    "xgboost>=3.0.2",
+]
