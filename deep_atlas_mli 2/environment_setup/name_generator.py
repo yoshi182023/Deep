@@ -17,6 +17,6 @@ def get_name():
     ]
 
     # To get random names, comment out this line
-    names = ["person who loaded the name_generator.py custom module file, but hasn't edited it yet"]
-
+    names = ["Mia Nina"]
+   
     return random.choice(names)
