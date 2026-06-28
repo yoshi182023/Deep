@@ -213,6 +213,95 @@ class RAGPipeline:
         print("✓ RAG 管道已关闭")
 
 
+class LocalGeminiRAGPipeline:
+    """Gemini LLM + 本地 JSON 检索（无需 PostgreSQL）"""
+
+    def __init__(
+        self,
+        gemini_api_key: str,
+        model: str = "gemini-2.0-flash",
+        top_k: int = 5,
+    ):
+        from local_retrieval import LocalEmailRetriever
+
+        self.model = model
+        self.top_k = top_k
+        self.client = genai.Client(api_key=gemini_api_key)
+        self.retriever = LocalEmailRetriever()
+        print(f"✓ 本地 Gemini RAG 管道初始化完成 (模型: {model}, top_k: {top_k})")
+
+    def ask(self, question: str, use_cache: bool = True) -> RAGResponse:
+        print(f"\n💬 问题: {question}")
+        print("🔍 检索相关邮件...")
+
+        search_results = self.retriever.search_hybrid(question, top_k=self.top_k)
+        results = [
+            {
+                "email_id": r.email_id,
+                "company": r.company,
+                "job_title": r.job_title,
+                "person_name": r.person_name,
+                "contact_info": r.contact_info,
+                "similarity_score": r.similarity_score,
+            }
+            for r in search_results
+        ]
+
+        print(f"   → 检索完成，找到 {len(results)} 封相关邮件")
+
+        context_lines = []
+        for i, r in enumerate(results, 1):
+            context_lines.append(f"--- 邮件 {i} ({r.get('email_id', 'unknown')}) ---")
+            context_lines.append(f"公司: {r.get('company') or '未知'}")
+            context_lines.append(f"联系人: {r.get('person_name') or '未知'}")
+            context_lines.append(f"职位: {r.get('job_title') or '未知'}")
+            context_lines.append(f"联系方式: {r.get('contact_info') or '未知'}")
+            context_lines.append(f"相关度: {r.get('similarity_score', 0):.1%}")
+            context_lines.append("")
+
+        context = "\n".join(context_lines) if context_lines else "（未找到相关邮件）"
+        user_message = f"""请基于以下招聘邮件数据回答问题。
+
+**检索到的相关邮件：**
+{context}
+
+**用户问题：**
+{question}
+"""
+
+        print("🤖 生成答案中...")
+        try:
+            response = self.client.models.generate_content(
+                model=self.model,
+                contents=user_message,
+                config=types.GenerateContentConfig(
+                    system_instruction=SYSTEM_PROMPT,
+                    temperature=0.3,
+                    max_output_tokens=800,
+                ),
+            )
+            answer = response.text
+        except Exception as e:
+            print(f"   ⚠️  LLM 调用失败 ({e.__class__.__name__})，降级为模板答案")
+            mock = MockRAGPipeline.__new__(MockRAGPipeline)
+            answer = mock._generate_template_answer(question, search_results)
+
+        print(f"\n📝 答案:\n{answer}")
+
+        return RAGResponse(
+            question=question,
+            answer=answer,
+            sources=results,
+            model=self.model,
+            retrieved_count=len(results),
+            cache_hit=False,
+        )
+
+    def close(self):
+        self.retriever.close()
+        print("✓ 本地 Gemini RAG 管道已关闭")
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # 演示模式：无 API Key 时使用本地模板生成答案
 # ──────────────────────────────────────────────────────────────────────────────
@@ -220,9 +309,16 @@ class RAGPipeline:
 class MockRAGPipeline:
     """无需 OpenAI API Key 的演示 RAG 管道（基于模板规则生成答案）"""
 
-    def __init__(self, connection_url: str, top_k: int = 5):
+    def __init__(self, connection_url: str = None, top_k: int = 5, retriever=None):
         self.top_k = top_k
-        self.retriever = EmailRetriever(connection_url)
+        if retriever is not None:
+            self.retriever = retriever
+        elif connection_url:
+            self.retriever = EmailRetriever(connection_url)
+        else:
+            from local_retrieval import LocalEmailRetriever
+
+            self.retriever = LocalEmailRetriever()
         print("✓ 演示 RAG 管道初始化完成（Mock 模式，无需 API Key）")
 
     def ask(self, question: str) -> RAGResponse:
