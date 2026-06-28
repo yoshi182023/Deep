@@ -3,3 +3,7 @@ lora/
 
 # Optional: keep local notebooks outputs out of git if needed
 *.ipynb_checkpoints/
+
+# Environment variables - DO NOT COMMIT
+.env
+.env.local
