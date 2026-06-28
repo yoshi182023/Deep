@@ -167,12 +167,12 @@ class SemanticCache:
             query_embedding = self._generate_embedding(query)
             
             try:
-                sql = """
+                sql = f"""
                 SELECT cache_key, query, results, created_at,
                        1 - (query_embedding <=> %s::vector) as similarity
                 FROM semantic_cache
                 WHERE (1 - (query_embedding <=> %s::vector)) > %s
-                  AND created_at > CURRENT_TIMESTAMP - INTERVAL '%d seconds'
+                  AND created_at > CURRENT_TIMESTAMP - INTERVAL '{self.cache_ttl} seconds'
                 ORDER BY similarity DESC
                 LIMIT 1
                 """
@@ -180,7 +180,7 @@ class SemanticCache:
                 embedding_str = str(query_embedding)
                 
                 self.cursor.execute(
-                    sql % self.cache_ttl,
+                    sql,
                     (embedding_str, embedding_str, self.similarity_threshold)
                 )
                 row = self.cursor.fetchone()
@@ -229,7 +229,7 @@ class SemanticCache:
                 results = EXCLUDED.results,
                 metadata = EXCLUDED.metadata,
                 accessed_at = CURRENT_TIMESTAMP,
-                access_count = access_count + 1
+                access_count = semantic_cache.access_count + 1
             """
             
             embedding_str = str(query_embedding)
