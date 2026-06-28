@@ -9,9 +9,6 @@ This document uses Qdrant and Redis as the major components. Adapt the code to s
 
 ## Understanding Scale
 
-RAG systems face compounding challenges as document volume increases.
-随着文档数量不断增加，RAG 系统会遇到越来越多的叠加问题。
-
 - 1,000 documents: ~200ms retrieval, manageable costs
 - 1,000 篇文档：约 200ms 检索，成本可控
 - 10,000 documents: ~2s queries, rising costs

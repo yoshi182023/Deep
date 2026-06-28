@@ -1,9 +1,8 @@
-Newsletter Expert - RAG-Powered Newsletter Analysis
+Newsletter Expert - RAG-Powered 
 新闻通讯专家 - 基于 RAG 的新闻通讯分析
 Time to apply RAG to personal knowledge management!
 是时候将 RAG 应用于个人知识管理了！
 
-Objectives:
 
 
 Build a system that recaps your newsletters using Retrieval-Augmented Generation
