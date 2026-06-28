@@ -8,7 +8,7 @@ from typing import List, Dict
 import gradio as gr
 from dotenv import load_dotenv
 
-from answer_generation import LocalGeminiRAGPipeline, MockRAGPipeline, RAGPipeline
+from answer_generation import LocalGeminiRAGPipeline, RAGPipeline
 
 
 def _resolve_env_file() -> Path:
@@ -39,14 +39,17 @@ def get_pipeline():
 
     has_gemini = bool(gemini_api_key) and gemini_api_key != "your_gemini_api_key_here"
 
-    if has_gemini and not connection_url:
-        print("✓ 使用 Gemini + 本地 JSON 数据模式")
+    if not has_gemini:
+        raise RuntimeError("Missing GEMINI_API_KEY in .env")
+
+    if not connection_url:
+        print("Using Gemini + local JSON data mode")
         _pipeline = LocalGeminiRAGPipeline(
             gemini_api_key=gemini_api_key,
             model="gemini-2.0-flash",
             top_k=5,
         )
-    elif has_gemini and connection_url:
+    else:
         try:
             _pipeline = RAGPipeline(
                 connection_url=connection_url,
@@ -55,16 +58,12 @@ def get_pipeline():
                 top_k=5,
             )
         except Exception:
-            print("⚠️  数据库连接失败，降级为 Gemini + 本地 JSON 模式")
+            print("Database connection failed; falling back to Gemini + local JSON mode")
             _pipeline = LocalGeminiRAGPipeline(
                 gemini_api_key=gemini_api_key,
                 model="gemini-2.0-flash",
                 top_k=5,
             )
-    else:
-        if not connection_url:
-            print("⚠️  未配置 NEON_PG_CONNECTION_URL，使用本地 JSON 数据模式")
-        _pipeline = MockRAGPipeline(connection_url=connection_url, top_k=5)
 
     return _pipeline
 

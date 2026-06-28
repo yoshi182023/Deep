@@ -6,14 +6,13 @@ RAG pipeline that generates natural-language answers from retrieval results.
 # 基于检索结果使用 LLM 生成自然语言答案的 RAG 管道
 
 import os
-import json
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from dataclasses import dataclass
 import google.genai as genai
 from google.genai import types
 from dotenv import load_dotenv
 
-from retrieval import EmailRetriever, SearchResult
+from retrieval import EmailRetriever
 from semantic_cache import SemanticCache, CachedRetriever
 
 
@@ -178,23 +177,16 @@ class RAGPipeline:
 
         # 3. Call Gemini to generate the answer
         print("Generating answer...")
-        try:
-            response = self.client.models.generate_content(
-                model=self.model,
-                contents=user_message,
-                config=types.GenerateContentConfig(
-                    system_instruction=SYSTEM_PROMPT,
-                    temperature=0.3,
-                    max_output_tokens=800,
-                ),
-            )
-            answer = response.text
-        except Exception as e:
-            # Fall back to template answers when the API is unavailable
-            print(f"   LLM call failed ({e.__class__.__name__}); falling back to template answer")
-            mock = MockRAGPipeline.__new__(MockRAGPipeline)
-            sr_list = self.retriever.search_hybrid(question, top_k=self.top_k)
-            answer = mock._generate_template_answer(question, sr_list)
+        response = self.client.models.generate_content(
+            model=self.model,
+            contents=user_message,
+            config=types.GenerateContentConfig(
+                system_instruction=SYSTEM_PROMPT,
+                temperature=0.3,
+                max_output_tokens=800,
+            ),
+        )
+        answer = response.text
 
         print(f"\nAnswer:\n{answer}")
 
@@ -289,21 +281,16 @@ class LocalGeminiRAGPipeline:
 """
 
         print("Generating answer...")
-        try:
-            response = self.client.models.generate_content(
-                model=self.model,
-                contents=user_message,
-                config=types.GenerateContentConfig(
-                    system_instruction=SYSTEM_PROMPT,
-                    temperature=0.3,
-                    max_output_tokens=800,
-                ),
-            )
-            answer = response.text
-        except Exception as e:
-            print(f"   LLM call failed ({e.__class__.__name__}); falling back to template answer")
-            mock = MockRAGPipeline.__new__(MockRAGPipeline)
-            answer = mock._generate_template_answer(question, search_results)
+        response = self.client.models.generate_content(
+            model=self.model,
+            contents=user_message,
+            config=types.GenerateContentConfig(
+                system_instruction=SYSTEM_PROMPT,
+                temperature=0.3,
+                max_output_tokens=800,
+            ),
+        )
+        answer = response.text
 
         print(f"\nAnswer:\n{answer}")
 
@@ -321,128 +308,35 @@ class LocalGeminiRAGPipeline:
         print("Local Gemini RAG pipeline closed")
 
 
-# Demo mode: generate template answers without an API key
-# 演示模式：无 API Key 时使用本地模板生成答案
-
-class MockRAGPipeline:
-    """Demo RAG pipeline that uses rule-based template answers (no API key)."""
-    # 无需 API Key 的演示 RAG 管道（基于模板规则生成答案）
-
-    def __init__(self, connection_url: str = None, top_k: int = 5, retriever=None):
-        self.top_k = top_k
-        if retriever is not None:
-            self.retriever = retriever
-        elif connection_url:
-            self.retriever = EmailRetriever(connection_url)
-        else:
-            from local_retrieval import LocalEmailRetriever
-
-            self.retriever = LocalEmailRetriever()
-        print("Mock RAG pipeline ready (no API key required)")
-
-    def ask(self, question: str) -> RAGResponse:
-        """Generate a template answer from retrieval results."""
-        print(f"\nQuestion: {question}")
-        print("Retrieving relevant emails...")
-
-        results = self.retriever.search_hybrid(question, top_k=self.top_k)
-        result_dicts = [
-            {
-                "email_id": r.email_id,
-                "company": r.company,
-                "job_title": r.job_title,
-                "person_name": r.person_name,
-                "contact_info": r.contact_info,
-                "similarity_score": r.similarity_score,
-            }
-            for r in results
-        ]
-
-        print(f"   -> found {len(results)} relevant email(s)")
-
-        answer = self._generate_template_answer(question, results)
-        print(f"\nAnswer:\n{answer}")
-
-        return RAGResponse(
-            question=question,
-            answer=answer,
-            sources=result_dicts,
-            model="mock-template",
-            retrieved_count=len(results),
-            cache_hit=False,
-        )
-
-    def _generate_template_answer(self, question: str, results: List[SearchResult]) -> str:
-        """Build a template answer from retrieval results."""
-        if not results:
-            return "No recruiting information related to your question was found in the email database."
-
-        # Filter rows with usable company/title/contact fields
-        valid = [
-            r for r in results
-            if r.company or r.job_title or r.person_name
-        ]
-
-        if not valid:
-            return (
-                f"Found {len(results)} related email(s), but no structured company or job data could be extracted.\n"
-                f"Related email IDs: {', '.join(r.email_id for r in results[:3])}"
-            )
-
-        lines = [f"Found {len(valid)} relevant recruiting lead(s) in the email database:\n"]
-        for i, r in enumerate(valid, 1):
-            company = r.company or "Unknown company"
-            job = r.job_title or "Recruiter"
-            person = r.person_name or "Hiring contact"
-            contact = r.contact_info or "See original email"
-            lines.append(
-                f"{i}. **{company}**\n"
-                f"   Contact: {person} ({job})\n"
-                f"   Contact info: {contact}\n"
-                f"   Source: {r.email_id}"
-            )
-
-        lines.append(
-            f"\nSources: {', '.join(r.email_id for r in valid)}"
-        )
-        return "\n".join(lines)
-
-    def close(self):
-        self.retriever.close()
-        print("Mock RAG pipeline closed")
-
-
 def main():
     load_dotenv("/workspaces/Deep/.env")
 
     connection_url = os.getenv("NEON_PG_CONNECTION_URL")
     gemini_api_key = os.getenv("GEMINI_API_KEY", "")
 
-    if not connection_url:
-        print("Missing NEON_PG_CONNECTION_URL")
+    if not gemini_api_key or gemini_api_key == "your_gemini_api_key_here":
+        print("Missing GEMINI_API_KEY")
         return
 
     print("\n" + "=" * 80)
     print("Step 7: RAG Answer Generation")
     print("=" * 80)
 
-    use_mock = not gemini_api_key or gemini_api_key == "your_gemini_api_key_here"
-
-    if use_mock:
-        print("\nGEMINI_API_KEY not found; using mock RAG mode\n")
-        pipeline = MockRAGPipeline(connection_url, top_k=5)
+    if connection_url:
+        print("\nGemini API key detected; using database RAG pipeline\n")
+        pipeline = RAGPipeline(
+            connection_url=connection_url,
+            gemini_api_key=gemini_api_key,
+            model="gemini-2.0-flash",
+            top_k=5,
+        )
     else:
-        print("\nGemini API key detected; using LLM mode\n")
-        try:
-            pipeline = RAGPipeline(
-                connection_url=connection_url,
-                gemini_api_key=gemini_api_key,
-                model="gemini-2.0-flash",
-                top_k=5,
-            )
-        except Exception as e:
-            print(f"Gemini API unavailable ({e.__class__.__name__}); falling back to mock mode\n")
-            pipeline = MockRAGPipeline(connection_url, top_k=5)
+        print("\nGemini API key detected; using local JSON RAG pipeline\n")
+        pipeline = LocalGeminiRAGPipeline(
+            gemini_api_key=gemini_api_key,
+            model="gemini-2.0-flash",
+            top_k=5,
+        )
 
     # Sample questions:
     # - 哪些公司正在招聘工程师？
