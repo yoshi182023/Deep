@@ -1,0 +1,5 @@
+# Large local model artifacts
+lora/
+
+# Optional: keep local notebooks outputs out of git if needed
+*.ipynb_checkpoints/

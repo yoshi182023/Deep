@@ -155,9 +155,8 @@ Key metrics to monitor:
 - Latency: per component
 - 延迟：按模块统计
 - User feedback: thumbs up/down, relevance ratings
-- 用户反馈：点赞/点踩、相关性评分
 - Cost per query
-- 每次查询成本
+
 
 ## Implementation Strategy
 ## 实施策略

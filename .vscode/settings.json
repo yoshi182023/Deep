@@ -1,6 +1,13 @@
 {
-  "python.defaultInterpreterPath": "/Users/gongmia/Deep/.venv/bin/python",
+  "python.defaultInterpreterPath": "/usr/bin/python3",
   "python.terminal.activateEnvironment": true,
   "jupyter.kernels.excludePythonEnvironments": [],
-  "notebook.defaultFormatter": "ms-python.python"
+  "notebook.defaultFormatter": "ms-python.python",
+  "files.exclude": {
+    "**/lora": true
+  },
+  "search.exclude": {
+    "**/lora": true
+  },
+  "explorer.excludeGitIgnore": false
 }
