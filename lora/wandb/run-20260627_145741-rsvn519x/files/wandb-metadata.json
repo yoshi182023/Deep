@@ -1,0 +1,39 @@
+{
+  "os": "macOS-15.3.1-arm64-arm-64bit",
+  "python": "CPython 3.11.15",
+  "startedAt": "2026-06-27T21:57:41.600671Z",
+  "args": [
+    "-f",
+    "/private/var/folders/yn/t9z28spj1qzdrr5ftwrtlcgw0000gn/T/tmpaacnvv4f.json"
+  ],
+  "program": "<python with no main file>",
+  "git": {
+    "remote": "https://github.com/yoshi182023/Deep.git",
+    "commit": "cae5be9a4171bf913a61764614294b3b236b8617"
+  },
+  "email": "artisse18@gmail.com",
+  "root": "/Users/gongmia/Deep/deep_atlas_mli 2/lora",
+  "host": "gongdeMacBook-Air.local",
+  "executable": "/Users/gongmia/Deep/deep_atlas_mli 2/.venv/bin/python",
+  "cpu_count": 8,
+  "cpu_count_logical": 8,
+  "disk": {
+    "/": {
+      "total": "994662584320",
+      "used": "641924575232"
+    }
+  },
+  "memory": {
+    "total": "17179869184"
+  },
+  "apple": {
+    "name": "Apple M2",
+    "ecpuCores": 4,
+    "pcpuCores": 4,
+    "gpuCores": 10,
+    "memoryGb": 16,
+    "swapTotalBytes": "5368709120",
+    "ramTotalBytes": "17179869184"
+  },
+  "writerId": "rv76p3dp0m0lqn8cq1fy1cs8blomall4"
+}
