@@ -136,6 +136,7 @@ CREATE TABLE emails_rag (
 - [x] **混合排序**：向量搜索 + 全文搜索融合
   - 权重可配置：vector_weight (默认 0.6), text_weight (默认 0.4)
   - 自动去重处理
+  - 参考文档：[STEP5_HYBRID_RETRIEVAL.md](STEP5_HYBRID_RETRIEVAL.md)
 
 - [x] **专项搜索**：
   - 按公司搜索：`search_by_company()`
@@ -163,9 +164,12 @@ email_rag_pipeline/
 │   ├── 第 2 部分：向量嵌入
 │   └── 第 3 部分：数据库存储
 ├── retrieval.py                    # 检索系统 (✨ NEW)
+├── hybrid_retrieval.py             # 混合检索分析器 (✨ NEW - Step 5)
+├── STEP5_HYBRID_RETRIEVAL.md       # 混合检索详细文档 (✨ NEW)
 ├── output/
 │   ├── email_records.json          # 结构化邮件数据
-│   └── email_embeddings.json       # 向量嵌入
+│   ├── email_embeddings.json       # 向量嵌入
+│   └── hybrid_retrieval_report.md  # 混合检索性能报告
 ├── Takeout/Mail/
 │   └── Inbox                       # 原始邮件 (mbox 格式)
 └── README.md                       # 本文件
@@ -261,7 +265,70 @@ results = retriever.search_by_company("RMC Agency", top_k=10)
 results = retriever.search_by_job_title("Recruiter", top_k=10)
 ```
 
-### 性能测试结果
+### 混合检索系统 (Step 5) ✨
+
+**推荐用于生产环境！**
+
+#### 基础使用
+
+```python
+# 使用默认权重 (向量 60% + 全文 40%)
+results = retriever.search_hybrid(
+    query="Python 工程师",
+    top_k=10
+)
+```
+
+#### 自定义权重
+
+```python
+# 语义优先 (适合自然语言查询)
+results = retriever.search_hybrid(
+    query="找找看有没有在 Dallas 的职位",
+    top_k=10,
+    vector_weight=0.7,
+    text_weight=0.3
+)
+
+# 关键词优先 (适合已知信息查询)
+results = retriever.search_hybrid(
+    query="RMC Agency recruiter",
+    top_k=10,
+    vector_weight=0.4,
+    text_weight=0.6
+)
+```
+
+#### 性能分析与优化
+
+```python
+from hybrid_retrieval import HybridRetrievalAnalyzer
+
+analyzer = HybridRetrievalAnalyzer(connection_url)
+
+# 对比三种搜索方法的性能
+comparison = analyzer.compare_search_methods(
+    query="Python 工程师",
+    top_k=5,
+    iterations=3
+)
+
+# 优化权重配置
+optimization = analyzer.optimize_weights(
+    query="Python 工程师",
+    vector_weights=[0.1, 0.3, 0.5, 0.6, 0.7, 0.9]
+)
+
+# 生成推荐结果
+recommendations = analyzer.recommendation_system(
+    query="招聘机会",
+    top_k=5
+)
+
+analyzer.close()
+```
+
+**详细文档见**：[STEP5_HYBRID_RETRIEVAL.md](STEP5_HYBRID_RETRIEVAL.md)
 
 运行 `python retrieval.py` 的输出样本：
 
@@ -308,18 +375,19 @@ results = retriever.search_by_job_title("Recruiter", top_k=10)
 
 ## 📚 课程要求完成度
 
-### ✅ 已完成（85%）
+### ✅ 已完成（90%）
 - [x] 邮件数据收集 (172 封)
 - [x] 向量数据库设置 (pgvector)
 - [x] 数据预处理和清理
 - [x] 嵌入向量生成 (384-dim)
 - [x] 数据持久化存储
 - [x] 检索系统实现 (向量 + 全文 + 混合)
+- [x] 混合检索优化 (权重调优、性能分析)
 
-### ⏳ 进行中（15%）
+### ⏳ 进行中（10%）
 - [ ] LLM 集成 (RAG 生成)
 - [ ] 问答系统构建
-- [ ] 性能评估
+- [ ] 性能评估与优化
 
 ### 📋 额外加分（未开始）
 - [ ] 模型性能优化
@@ -348,7 +416,8 @@ results = retriever.search_by_job_title("Recruiter", top_k=10)
 ### 短期（1-2 小时）
 1. ✅ 实现向量搜索 API
 2. ✅ 构建基础检索系统
-3. ⏳ 集成 OpenAI API 进行答案生成
+3. ✅ 实现混合检索系统与权重优化
+4. ⏳ 集成 OpenAI API 进行答案生成
 
 ### 中期（2-3 小时）
 1. 实现完整 RAG 管道
@@ -363,4 +432,4 @@ results = retriever.search_by_job_title("Recruiter", top_k=10)
 ---
 
 **最后更新**：2026-06-28
-**项目状态**：Beta (第 3 阶段 - 检索系统完成，等待 LLM 集成)
+**项目状态**：Beta (第 5 步混合检索完成，90% 项目完成度)
