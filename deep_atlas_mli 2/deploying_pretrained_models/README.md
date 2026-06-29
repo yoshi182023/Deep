@@ -456,13 +456,13 @@ Multiple models can coexist. Single servers can host multiple model endpoints si
 
 
 真实世界应用
-Production image classification: Deploy computer vision models for content moderation, quality control, or automated tagging
-生产级图像分类：部署计算机视觉模型用于内容审核、质量控制或自动打标
-Multi-modal search: Use CLIP-style models for searching images with text queries in e-commerce or media platforms
+生产级图像分类：部署计算机视觉模型用于内容审核、质量控制或 自动打标
 多模态搜索：在电商或媒体平台中使用 CLIP 类模型，通过文本查询搜索图像
-Edge deployment: Package models for deployment on edge devices or air-gapped environments
 边缘部署：将模型打包部署到边缘设备或隔离网络环境
 Model versioning: Roll out new model versions alongside existing ones for safe production updates
-模型版本管理：在现有版本旁逐步发布新版本，实现安全生产更新
-Microservices architecture: Expose ML models as HTTP APIs that integrate with existing web services
+模型版本管理：在现有 版本 旁逐步 发布新版本，实现 安全生产更新
 微服务架构：将机器学习模型以 HTTP API 形式暴露，并与现有 Web 服务集成
+
+Why does MLOps emphasize packaging models into artifacts (e.g., TorchServe .mar files) instead of just sharing Python code and weights?
+Artifacts combine code, weights, and handlers into a reproducible unit for deployment and versioning.
+**工件将 代码、权重和处理程序组合成一个 可重复的 单元，用于部署和版本控制**
