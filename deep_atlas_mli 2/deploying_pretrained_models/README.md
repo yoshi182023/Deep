@@ -1,85 +1,81 @@
 Key Takeaways
-关键要点
+
 1. MLOps as the Backbone of the ML Lifecycle
-1. MLOps 作为机器学习生命周期的骨架
-Big Picture: MLOps extends DevOps into machine learning, ensuring smooth transitions across data ingestion, model development, deployment, and monitoring.
-全局视角：MLOps 将 DevOps 扩展到机器学习中，确保数据摄取、模型开发、部署与监控之间平滑衔接。
-Why It Matters: Without structured handoffs and reproducible pipelines, models degrade quickly or fail to scale in production.
-重要性：没有结构化交接和可复现流水线，模型会快速退化或无法在生产环境扩展。
-Consider: How would your team’s productivity change if data, models, and deployment environments weren’t standardized?
-思考：如果数据、模型和部署环境没有标准化，你的团队生产力会发生什么变化？
+   Big Picture: MLOps extends DevOps into machine learning, ensuring smooth transitions across data ingestion, model development, deployment, and monitoring.
+   Why It Matters: Without structured handoffs and reproducible pipelines, models degrade quickly or fail to scale in production.
+   重要性：没有结构化交接和可复现流水线，模型会快速退化或无法在生产环境扩展。
 2. Data as the Starting Point
-2. 数据是起点
-Core Insight: Data ingestion, preparation, and feature engineering are prerequisites for meaningful modeling.
-核心洞察：数据摄取、数据准备和特征工程是有效建模的前提。
-How It Connects: Garbage in, garbage out — high-quality, version-controlled data underpins reliable models.
-关联逻辑：垃圾进，垃圾出——高质量且有版本管理的数据是可靠模型的基础。
-Practice: Use tools like Pachyderm (or simple folder structures with metadata) to keep track of dataset versions.
-实践建议：使用 Pachyderm（或带元数据的简单文件夹结构）来追踪数据集版本。
-So What?: Losing track of which dataset trained which model undermines reproducibility and governance.
-所以呢：搞不清哪个数据集训练了哪个模型，会破坏可复现性和治理能力。
-3. Experiment Tracking & Reproducibility
-3. 实验跟踪与可复现性
-Framework: Tools like Weights & Biases or Neptune AI log experiments, hyperparameters, and performance curves.
-框架：Weights & Biases、Neptune AI 等工具可记录实验、超参数和性能曲线。
-Reasoning Process: Unlike static code, ML models evolve through many iterations — history matters.
-推理过程：与静态代码不同，ML 模型会经过多轮迭代演化——历史记录很重要。
-Analogy: Think of experiment tracking as version control for scientific discovery, not just software.
-类比：把实验跟踪看作科学发现的版本控制，而不只是软件版本控制。
-Problem to Solve: How would you defend your model choices six months later without experiment logs?
-待解决问题：如果没有实验日志，六个月后你如何为模型选择进行辩护？
-4. Automation Through Orchestration Pipelines
-4. 通过编排流水线实现自动化
-Concept: Orchestration tools (Airflow, MLflow, Kubeflow, Metaflow, ZenML) automate workflows and enforce consistency.
-概念：编排工具（Airflow、MLflow、Kubeflow、Metaflow、ZenML）可自动化工作流并保证一致性。
-Key Decision Point: Choose triggers (manual vs automatic) carefully, since retraining frequency balances cost with model freshness.
-关键决策点：谨慎选择触发方式（手动/自动），因为重训练频率需要在成本与模型新鲜度之间平衡。
-Pitfall: Failing to separate pipelines by environment (data, training, inference) leads to brittle systems.
-常见陷阱：未按环境（数据、训练、推理）拆分流水线会导致系统脆弱。
-Transferable Insight: Any repetitive process that requires reliability benefits from automation.
-可迁移洞察：任何需要可靠性的重复流程都能从自动化中受益。
-5. Deployment and Monitoring as Continuous Loops
-5. 将部署与监控视为持续循环
-Deployment Breakdown: Export → Registry → Deployment (e.g., TorchServe, Docker, EC2).
-部署拆解：导出 → 注册中心 → 部署（例如 TorchServe、Docker、EC2）。
-Monitoring Focus: Beyond latency and throughput, track model drift and data drift to detect performance decay.
-监控重点：除了时延与吞吐，还要跟踪模型漂移和数据漂移，以发现性能衰减。
-Generative Models Twist: Standard metrics often fail — user feedback loops (thumbs up/down) become critical.
-生成式模型的变化点：标准指标常常失效——用户反馈闭环（点赞/点踩）变得关键。
-So What?: Deployment isn’t an endpoint; it’s the beginning of continuous quality assurance.
-所以呢：部署不是终点，而是持续质量保障的起点。
-6. Governance, Checkpointing, and Compliance
-6. 治理、检查点与合规
-Checkpointing: Save serialized snapshots of models to resume training or recover from failures.
-检查点：保存模型序列化快照，以便恢复训练或从故障中恢复。
-Governance: Logging datasets and training processes is essential for audits (e.g., legal disputes about training data).
-治理：记录数据集与训练流程对审计至关重要（例如训练数据相关法律争议）。
-Practical Relevance: Without checkpoints, model recovery is costly. Without logs, compliance is impossible.
-实际意义：没有检查点，模型恢复成本高；没有日志，合规几乎不可能。
-7. Platforms and Advanced Considerations
-7. 平台与进阶考量
-Full-Service Platforms: Amazon SageMaker, Google Vertex, and AutoML provide end-to-end solutions for teams with varied expertise.
-全托管平台：Amazon SageMaker、Google Vertex、AutoML 为不同能力层次的团队提供端到端方案。
-Distributed Training: Tools like Ray enable parallelization across GPUs, crucial for large models.
-分布式训练：Ray 等工具支持跨 GPU 并行，对大模型尤为关键。
-Training Paradigms: Batch vs online training trade off stability vs adaptability.
-训练范式：批量训练与在线训练是在稳定性与适应性之间做权衡。
-Deployment Targets: Models may need to run in cloud APIs, mobile apps, or local inference — ONNX and CoreML bridge these.
-部署目标：模型可能需要运行在云 API、移动应用或本地推理中——ONNX 与 CoreML 可起到桥接作用。
-So What?: Platform choice and deployment strategy determine scalability and accessibility.
-所以呢：平台选择与部署策略决定可扩展性与可达性。
-8. From Notebooks to Production Pipelines
-8. 从 Notebook 到生产流水线
-Core Shift: Notebooks are great for exploration but fragile in production.
-核心转变：Notebook 适合探索，但在生产环境中较脆弱。
-Tooling: Systems like Kale help convert notebooks into Kubeflow pipelines.
-工具支持：Kale 等系统可帮助将 Notebook 转换为 Kubeflow 流水线。
-Misconception: Productionizing ML is just about “exporting code” — in reality, it’s about building reproducible, automated systems.
-常见误解：把 ML 投入生产只是“导出代码”——实际上是构建可复现、自动化系统。
-Deploying pre-trained models
-部署预训练模型
-Get started by clicking 'download' and moving the downloaded content into your main coursework folder. You'll need these files to complete the exercise.
-点击“download”开始，并将下载内容移动到你的课程主文件夹中。完成本练习需要这些文件。
+3. 数据是起点
+   Core Insight: Data ingestion, preparation, and feature engineering are prerequisites for meaningful modeling.
+   核心洞察：数据摄取、数据准备和特征工程是有效建模的前提。
+   How It Connects: Garbage in, garbage out — high-quality, version-controlled data underpins reliable models.
+   关联逻辑：垃圾进，垃圾出——高质量且有版本管理的数据是可靠模型的基础。
+   Practice: Use tools like Pachyderm (or simple folder structures with metadata) to keep track of dataset versions.
+   实践建议：使用 Pachyderm（或带元数据的简单文件夹结构）来追踪数据集版本。
+   So What?: Losing track of which dataset trained which model undermines reproducibility and governance.
+   所以呢：搞不清哪个数据集训练了哪个模型，会破坏可复现性和治理能力。
+4. Experiment Tracking & Reproducibility
+5. 实验跟踪与可复现性
+   Framework: Tools like Weights & Biases or Neptune AI log experiments, hyperparameters, and performance curves.
+   框架：Weights & Biases、Neptune AI 等工具可记录实验、超参数和性能曲线。
+   Reasoning Process: Unlike static code, ML models evolve through many iterations — history matters.
+   推理过程：与静态代码不同，ML 模型会经过多轮迭代演化——历史记录很重要。
+   Analogy: Think of experiment tracking as version control for scientific discovery, not just software.
+   类比：把实验跟踪看作科学发现的版本控制，而不只是软件版本控制。
+   Problem to Solve: How would you defend your model choices six months later without experiment logs?
+   待解决问题：如果没有实验日志，六个月后你如何为模型选择进行辩护？
+6. Automation Through Orchestration Pipelines
+7. 通过编排流水线实现自动化
+   Concept: Orchestration tools (Airflow, MLflow, Kubeflow, Metaflow, ZenML) automate workflows and enforce consistency.
+   概念：编排工具（Airflow、MLflow、Kubeflow、Metaflow、ZenML）可自动化工作流并保证一致性。
+   Key Decision Point: Choose triggers (manual vs automatic) carefully, since retraining frequency balances cost with model freshness.
+   关键决策点：谨慎选择触发方式（手动/自动），因为重训练频率需要在成本与模型新鲜度之间平衡。
+   Pitfall: Failing to separate pipelines by environment (data, training, inference) leads to brittle systems.
+   常见陷阱：未按环境（数据、训练、推理）拆分流水线会导致系统脆弱。
+   Transferable Insight: Any repetitive process that requires reliability benefits from automation.
+   可迁移洞察：任何需要可靠性的重复流程都能从自动化中受益。
+8. Deployment and Monitoring as Continuous Loops
+9. 将部署与监控视为持续循环
+   Deployment Breakdown: Export → Registry → Deployment (e.g., TorchServe, Docker, EC2).
+   部署拆解：导出 → 注册中心 → 部署（例如 TorchServe、Docker、EC2）。
+   Monitoring Focus: Beyond latency and throughput, track model drift and data drift to detect performance decay.
+   监控重点：除了时延与吞吐，还要跟踪模型漂移和数据漂移，以发现性能衰减。
+   Generative Models Twist: Standard metrics often fail — user feedback loops (thumbs up/down) become critical.
+   生成式模型的变化点：标准指标常常失效——用户反馈闭环（点赞/点踩）变得关键。
+   So What?: Deployment isn’t an endpoint; it’s the beginning of continuous quality assurance.
+   所以呢：部署不是终点，而是持续质量保障的起点。
+10. Governance, Checkpointing, and Compliance
+11. 治理、检查点与合规
+    Checkpointing: Save serialized snapshots of models to resume training or recover from failures.
+    检查点：保存模型序列化快照，以便恢复训练或从故障中恢复。
+    Governance: Logging datasets and training processes is essential for audits (e.g., legal disputes about training data).
+    治理：记录数据集与训练流程对审计至关重要（例如训练数据相关法律争议）。
+    Practical Relevance: Without checkpoints, model recovery is costly. Without logs, compliance is impossible.
+    实际意义：没有检查点，模型恢复成本高；没有日志，合规几乎不可能。
+12. Platforms and Advanced Considerations
+13. 平台与进阶考量
+    Full-Service Platforms: Amazon SageMaker, Google Vertex, and AutoML provide end-to-end solutions for teams with varied expertise.
+    全托管平台：Amazon SageMaker、Google Vertex、AutoML 为不同能力层次的团队提供端到端方案。
+    Distributed Training: Tools like Ray enable parallelization across GPUs, crucial for large models.
+    分布式训练：Ray 等工具支持跨 GPU 并行，对大模型尤为关键。
+    Training Paradigms: Batch vs online training trade off stability vs adaptability.
+    训练范式：批量训练与在线训练是在稳定性与适应性之间做权衡。
+    Deployment Targets: Models may need to run in cloud APIs, mobile apps, or local inference — ONNX and CoreML bridge these.
+    部署目标：模型可能需要运行在云 API、移动应用或本地推理中——ONNX 与 CoreML 可起到桥接作用。
+    So What?: Platform choice and deployment strategy determine scalability and accessibility.
+    所以呢：平台选择与部署策略决定可扩展性与可达性。
+14. From Notebooks to Production Pipelines
+15. 从 Notebook 到生产流水线
+    Core Shift: Notebooks are great for exploration but fragile in production.
+    核心转变：Notebook 适合探索，但在生产环境中较脆弱。
+    Tooling: Systems like Kale help convert notebooks into Kubeflow pipelines.
+    工具支持：Kale 等系统可帮助将 Notebook 转换为 Kubeflow 流水线。
+    Misconception: Productionizing ML is just about “exporting code” — in reality, it’s about building reproducible, automated systems.
+    常见误解：把 ML 投入生产只是“导出代码”——实际上是构建可复现、自动化系统。
+    Deploying pre-trained models
+    部署预训练模型
+    Get started by clicking 'download' and moving the downloaded content into your main coursework folder. You'll need these files to complete the exercise.
+    点击“download”开始，并将下载内容移动到你的课程主文件夹中。完成本练习需要这些文件。
 
 Objectives:
 目标：
@@ -208,15 +204,19 @@ Note: The following steps can be done locally on your computer or on the EC2 ins
 注意：以下步骤可在本地电脑或 EC2 实例上执行（推荐在 EC2）。若在本地创建 .mar 文件，需要用 scp 或类似方式复制到实例。
 
 # Install TorchServe and related utilities
+
 conda install torchserve torch-model-archiver torch-workflow-archiver -c pytorch
 
 # Create a folder to store the output
+
 mkdir model_store
 
 # Download the `.pth` "state dict" file from PyTorch's model zoo
+
 wget https://download.pytorch.org/models/densenet161-8d451a50.pth
 
 # Clone the TorchServe repo which contains usable examples of `model.py` and `index_to_name.json` for the DenseNet model
+
 git clone https://github.com/pytorch/serve.git
 Creating a Model Archive File
 创建模型归档文件
@@ -261,10 +261,12 @@ Install Docker on your instance (assuming you are not using the DL AMI). The fol
 在实例上安装 Docker（假设你未使用 DL AMI）。以下步骤摘自便捷脚本指南。
 
 # for Ubuntu AMI
+
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 
 # In the Amazon Linux AMI, you may need to use `sudo yum install docker -y`)
+
 Running the Server
 运行服务器
 You have to start the Docker process before you can issue docker commands.
@@ -309,11 +311,11 @@ If it's working, you should get in response something approximately like:
 若运行正常，你会收到大致如下响应：
 
 {
-  "tabby": 0.46661895513534546,
-  "tiger_cat": 0.46449047327041626,
-  "Egyptian_cat": 0.06614057719707489,
-  "lynx": 0.0012924452312290668,
-  "plastic_bag": 0.00022909804829396307
+"tabby": 0.46661895513534546,
+"tiger_cat": 0.46449047327041626,
+"Egyptian_cat": 0.06614057719707489,
+"lynx": 0.0012924452312290668,
+"plastic_bag": 0.00022909804829396307
 }
 Deploying CLIP with custom TorchServe handlers
 使用自定义 TorchServe handler 部署 CLIP
@@ -377,8 +379,8 @@ Run the following command to generate the file
 运行以下命令生成该文件
 cat << EOF > model.py
 class Model:
-    def __init__(self):
-        pass
+def **init**(self):
+pass
 EOF
 Creating a Custom Handler File
 创建自定义 Handler 文件
