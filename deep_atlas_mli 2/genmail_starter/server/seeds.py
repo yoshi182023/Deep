@@ -1,5 +1,6 @@
+# 种子邮件数据：共 23 封，涵盖多个工作线程，供开发和测试使用
 SEED_EMAILS = [
-    # Thread 1: Phoenix launch timeline (3 emails) - started Dec 28
+    # 线程 1：Phoenix 发布时间表（3 封）- 始于 12 月 28 日
     {
         "thread_id": "phoenix-timeline-001",
         "sender": "david.park@acme.com",
@@ -28,7 +29,7 @@ SEED_EMAILS = [
         "is_read": True
     },
 
-    # Thread 2: Mobile app offline feature (4 emails) - started Jan 2
+    # 线程 2：Mobile 离线功能（4 封）- 始于 1 月 2 日
     {
         "thread_id": "mobile-offline-002",
         "sender": "sarah.chen@acme.com",
@@ -66,7 +67,7 @@ SEED_EMAILS = [
         "is_read": True
     },
 
-    # Single email: Team recognition - Jan 6
+    # 单封邮件：团队表扬 - 1 月 6 日
     {
         "thread_id": "recognition-012",
         "sender": "pm@acme.com",
@@ -77,7 +78,7 @@ SEED_EMAILS = [
         "is_read": True
     },
 
-    # Thread 3: Design review (2 emails) - Jan 8
+    # 线程 3：设计评审（2 封）- 1 月 8 日
     {
         "thread_id": "design-review-003",
         "sender": "marcus.rivera@acme.com",
@@ -97,7 +98,7 @@ SEED_EMAILS = [
         "is_read": True
     },
 
-    # Single email: Vendor follow-up - Jan 10
+    # 单封邮件：供应商跟进 - 1 月 10 日
     {
         "thread_id": "vendor-013",
         "sender": "pm@acme.com",
@@ -108,7 +109,7 @@ SEED_EMAILS = [
         "is_read": True
     },
 
-    # Thread 4: Enterprise dashboard requirements (3 emails) - Jan 13-14
+    # 线程 4：企业仪表盘需求（3 封）- 1 月 13–14 日
     {
         "thread_id": "enterprise-dash-004",
         "sender": "jennifer.walsh@acme.com",
@@ -137,7 +138,7 @@ SEED_EMAILS = [
         "is_read": False
     },
 
-    # Single email: Data insights - Jan 17
+    # 单封邮件：数据洞察 - 1 月 17 日
     {
         "thread_id": "data-insights-006",
         "sender": "rachel.kim@acme.com",
@@ -148,7 +149,7 @@ SEED_EMAILS = [
         "is_read": True
     },
 
-    # Single email: Competitive intel - Jan 20
+    # 单封邮件：竞争情报 - 1 月 20 日
     {
         "thread_id": "competitive-011",
         "sender": "jennifer.walsh@acme.com",
@@ -158,7 +159,7 @@ SEED_EMAILS = [
         "created_at": "2026-01-20T11:25:00"
     },
 
-    # Thread 5: Marketing launch prep (2 emails) - Jan 22
+    # 线程 5：营销发布准备（2 封）- 1 月 22 日
     {
         "thread_id": "marketing-launch-007",
         "sender": "lisa.thompson@acme.com",
@@ -177,7 +178,7 @@ SEED_EMAILS = [
         "is_read": True
     },
 
-    # Single email: Customer feedback - Jan 24
+    # 单封邮件：客户反馈 - 1 月 24 日
     {
         "thread_id": "support-feedback-005",
         "sender": "mike.johnson@acme.com",
@@ -187,7 +188,7 @@ SEED_EMAILS = [
         "created_at": "2026-01-24T09:00:00"
     },
 
-    # Single email: Meeting request - Jan 25
+    # 单封邮件：会议邀请 - 1 月 25 日
     {
         "thread_id": "meeting-008",
         "sender": "sarah.chen@acme.com",
@@ -197,7 +198,7 @@ SEED_EMAILS = [
         "created_at": "2026-01-25T14:30:00"
     },
 
-    # Thread 6: Bug escalation (2 emails) - Jan 26
+    # 线程 6：Bug 升级（2 封）- 1 月 26 日
     {
         "thread_id": "bug-escalation-010",
         "sender": "mike.johnson@acme.com",
@@ -216,7 +217,7 @@ SEED_EMAILS = [
         "is_read": True
     },
 
-    # Single email: PM sending status update - Jan 26
+    # 单封邮件：PM 发送周报 - 1 月 26 日
     {
         "thread_id": "status-009",
         "sender": "pm@acme.com",

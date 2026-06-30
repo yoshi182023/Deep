@@ -1,3 +1,4 @@
+// 右侧邮件详情：展示线程对话、回复、删除、标未读
 import { useState, useRef, useEffect } from "react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -33,6 +34,7 @@ export function EmailViewer({ selectedEmail, threadEmails, onEmailSent, onDelete
   const [replyBody, setReplyBody] = useState("")
   const selectedRef = useRef<HTMLDivElement>(null)
 
+  // 选中邮件变化时滚动到该条消息
   useEffect(() => {
     if (selectedRef.current) {
       selectedRef.current.scrollIntoView({ behavior: "smooth", block: "center" })
@@ -55,6 +57,7 @@ export function EmailViewer({ selectedEmail, threadEmails, onEmailSent, onDelete
   const threadSubject = threadEmails[0]?.subject || selectedEmail.subject
   const latestEmail = threadEmails[threadEmails.length - 1] || selectedEmail
 
+  // 回复线程中最新一封邮件
   const handleReply = () => {
     const replySubject = latestEmail.subject.startsWith("Re: ") ? latestEmail.subject : `Re: ${latestEmail.subject}`
     fetch(`${API_BASE}/emails`, {

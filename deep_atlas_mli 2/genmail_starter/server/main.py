@@ -1,27 +1,35 @@
+# GenMail 后端入口：Flask REST API + SQLite
 import uuid
 from datetime import datetime
 from flask import Flask, request
 from flask_cors import CORS
+from openai import APIError
+from agents.env import load_env_file
 from agents.summarizer import summarize_thread
 from models import db, Email
 from seeds import SEED_EMAILS
 
+# 启动时加载 server/.env 中的环境变量
+load_env_file()
+
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///emails.db"
-CORS(app)
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///emails.db"  # SQLite 数据库文件
+CORS(app)  # 允许前端跨域访问
 db.init_app(app)
 
+# 应用启动时自动建表（若不存在）
 with app.app_context():
     db.create_all()
 
 
 @app.route("/ping")
-def ping():
+def ping():# 健康检查
     return {"message": "pong"}
 
 
 @app.route("/emails", methods=["POST"])
 def create_email():
+    """创建新邮件；未传 thread_id 时自动生成新线程"""
     data = request.json
     email = Email(
         thread_id=data.get("thread_id") or str(uuid.uuid4()),
@@ -37,6 +45,7 @@ def create_email():
 
 @app.route("/emails", methods=["GET"])
 def get_emails():
+    """获取邮件列表，支持按线程、已读状态、发件人、收件人过滤"""
     query = Email.query
 
     thread_id = request.args.get("thread_id")
@@ -61,12 +70,14 @@ def get_emails():
 
 @app.route("/emails/<int:email_id>", methods=["GET"])
 def get_email(email_id):
+    """获取单封邮件"""
     email = Email.query.get_or_404(email_id)
     return email.to_dict()
 
 
 @app.route("/emails/<int:email_id>", methods=["PUT"])
 def update_email(email_id):
+    """更新邮件字段（含 is_read）"""
     email = Email.query.get_or_404(email_id)
     data = request.json
     email.sender = data.get("sender", email.sender)
@@ -81,6 +92,7 @@ def update_email(email_id):
 
 @app.route("/emails/<int:email_id>/read", methods=["PATCH"])
 def mark_email_read(email_id):
+    """将邮件标记为已读"""
     email = Email.query.get_or_404(email_id)
     email.is_read = True
     db.session.commit()
@@ -89,6 +101,7 @@ def mark_email_read(email_id):
 
 @app.route("/emails/<int:email_id>", methods=["DELETE"])
 def delete_email(email_id):
+    """删除单封邮件"""
     email = Email.query.get_or_404(email_id)
     db.session.delete(email)
     db.session.commit()
@@ -97,6 +110,7 @@ def delete_email(email_id):
 
 @app.route("/threads", methods=["GET"])
 def get_threads():
+    """按 thread_id 聚合，返回每个线程的摘要元数据"""
     threads = db.session.query(
         Email.thread_id,
         db.func.min(Email.subject).label("subject"),
@@ -121,6 +135,7 @@ def get_threads():
 
 @app.route("/stats", methods=["GET"])
 def get_stats():
+    """收件箱基础统计：总数、未读数、线程数"""
     total_emails = Email.query.count()
     unread_count = Email.query.filter_by(is_read=False).count()
     thread_count = db.session.query(Email.thread_id).distinct().count()
@@ -135,6 +150,7 @@ def get_stats():
 
 @app.route("/emails", methods=["DELETE"])
 def delete_emails():
+    """批量删除邮件，请求体需包含 ids 数组"""
     data = request.json
     Email.query.filter(Email.id.in_(data["ids"])).delete()
     db.session.commit()
@@ -143,10 +159,17 @@ def delete_emails():
 
 @app.route("/ai/summarize/<thread_id>", methods=["POST"])
 def ai_summarize(thread_id):
+    """AI 功能：生成指定线程的摘要（后加）"""
     try:
         result = summarize_thread(thread_id)
     except ValueError as exc:
         return {"error": str(exc)}, 400
+    except APIError as exc:
+        return {
+            "error": str(exc),
+            "type": "llm_api_error",
+            "hint": "Check API key billing/quota, or switch to Ollama for local inference.",
+        }, 502
 
     if result is None:
         return {"error": f"thread not found: {thread_id}"}, 404
@@ -156,6 +179,7 @@ def ai_summarize(thread_id):
 
 @app.route("/reset", methods=["POST"])
 def reset_database():
+    """清空数据库并重新导入 seeds.py 中的 23 封种子邮件"""
     db.drop_all()
     db.create_all()
     for seed in SEED_EMAILS:

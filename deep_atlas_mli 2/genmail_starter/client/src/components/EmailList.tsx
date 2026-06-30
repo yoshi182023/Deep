@@ -1,3 +1,4 @@
+// 左侧邮件列表：展示收件、撰写新邮件
 import { useState } from "react"
 import {
   Item,
@@ -38,6 +39,7 @@ export function EmailList({ emails, selectedEmail, onSelect, onEmailSent }: Emai
   const [subject, setSubject] = useState("")
   const [body, setBody] = useState("")
 
+  // 以当前用户身份发送新邮件（新线程）
   const handleSend = () => {
     fetch(`${API_BASE}/emails`, {
       method: "POST",

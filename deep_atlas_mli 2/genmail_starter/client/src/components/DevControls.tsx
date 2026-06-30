@@ -1,3 +1,4 @@
+// 开发工具栏：重置数据库、创建模拟收件
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -20,6 +21,7 @@ interface DevControlsProps {
   onEmailCreated: () => void
 }
 
+// 种子数据中的常用联系人
 const CONTACTS = [
   "david.park@acme.com",
   "jennifer.walsh@acme.com",
@@ -37,10 +39,12 @@ export function DevControls({ onReset, emails, onEmailCreated }: DevControlsProp
   const [subject, setSubject] = useState("")
   const [body, setBody] = useState("")
 
+  // 从现有邮件提取可选线程列表
   const threads = Array.from(
     new Map(emails.map((e) => [e.thread_id, { id: e.thread_id, subject: e.subject }])).values()
   )
 
+  // 创建一封模拟的「别人发来」的邮件
   const handleCreate = () => {
     fetch(`${API_BASE}/emails`, {
       method: "POST",

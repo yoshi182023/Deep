@@ -1,3 +1,4 @@
+// 主应用：邮件列表 + 详情视图 + 开发工具
 import { useEffect, useState } from "react"
 import type { Email } from "@/types"
 import { API_BASE } from "@/constants"
@@ -6,16 +7,18 @@ import { EmailList } from "@/components/EmailList"
 import { EmailViewer } from "@/components/EmailViewer"
 
 function App() {
-  const [emails, setEmails] = useState<Email[]>([])
-  const [selectedEmail, setSelectedEmail] = useState<Email | null>(null)
-  const [threadEmails, setThreadEmails] = useState<Email[]>([])
+  const [emails, setEmails] = useState<Email[]>([])  // 全部邮件
+  const [selectedEmail, setSelectedEmail] = useState<Email | null>(null)  // 当前选中的邮件
+  const [threadEmails, setThreadEmails] = useState<Email[]>([])  // 当前线程内的所有邮件
 
+  // 从后端拉取邮件列表
   const fetchEmails = () => {
     fetch(`${API_BASE}/emails`)
       .then((res) => res.json())
       .then((data) => setEmails(data))
   }
 
+  // 重置数据库为种子数据
   const resetDatabase = () => {
     fetch(`${API_BASE}/reset`, { method: "POST" }).then(() => {
       setSelectedEmail(null)
@@ -23,12 +26,14 @@ function App() {
     })
   }
 
+  // 删除邮件后刷新列表
   const handleDelete = () => {
     setSelectedEmail(null)
     setThreadEmails([])
     fetchEmails()
   }
 
+  // 选中邮件：加载同线程邮件，未读则标记已读
   const handleSelect = (email: Email) => {
     setSelectedEmail(email)
     fetch(`${API_BASE}/emails?thread_id=${email.thread_id}`)
