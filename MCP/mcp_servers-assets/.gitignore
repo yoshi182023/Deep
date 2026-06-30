@@ -1,0 +1,29 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.pytest_cache/
+
+# Virtual environments
+.venv
+
+# Task API database
+tasks.db
+
+# Test database
+test_tasks.db
+
+# API logs
+api.log
+
+# API test logs
+test_api.log
+
+# API test database
+test_tasks.db
+
+# API test logs
+test_api.log
