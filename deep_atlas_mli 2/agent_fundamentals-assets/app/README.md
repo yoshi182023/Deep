@@ -104,13 +104,14 @@ Request structured output (e.g., "show me all expenses as JSON").
 
 提示
 从 storage.py 开始：先让数据库层正常工作。在进入 agent 部分前，先在 Python REPL 中独立测试每个方法。
+理解工具 schema：
+学习 OpenAI 的函数调用格式。
+每个工具都需要 type、function.name、function.description，
+以及带正确类型的 function.parameters。
 
-Understand the tool schema: 
-Study the OpenAI function calling format. Each tool needs type, function.name, function.description, and function.parameters with proper types.
-理解工具 schema：学习 OpenAI 的函数调用格式。每个工具都需要 type、function.name、function.description，以及带正确类型的 function.parameters。
-
-Trace the conversation flow: Add print statements to see when messages are appended to conversation_history. Understanding the sequence (user -> assistant -> tool -> assistant) is crucial.
-追踪对话流程：添加 print 语句查看消息何时被追加到 conversation_history。理解这个顺序（user -> assistant -> tool -> assistant）非常关键。
+追踪对话流程：
+添加 print 语句查看消息何时被追加到 conversation_history。
+理解这个顺序（user -> assistant -> tool -> assistant）非常关键。
 
 Test error recovery manually: Before implementing the retry loop, trigger errors and observe what happens. Then design your retry logic accordingly.
 手动测试错误恢复：在实现重试循环前，先触发错误并观察现象，再据此设计重试逻辑。
@@ -121,10 +122,8 @@ Use parameterized queries: Never use f-strings for SQL queries. Always use ? pla
 Start simple, then enhance: Get basic add/get working first. Then add filters, updates, deletes, and finally error recovery.
 先简后繁：先实现基础的 add/get，再加入筛选、更新、删除，最后实现错误恢复。
 
-Testing Scenarios
-测试场景
 
-Try these conversations to validate your implementation:
+测试场景
 尝试以下对话来验证你的实现：
 
 "I spent $45 on groceries today"
