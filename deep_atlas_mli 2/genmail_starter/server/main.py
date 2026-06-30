@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime
 from flask import Flask, request
 from flask_cors import CORS
+from agents.summarizer import summarize_thread
 from models import db, Email
 from seeds import SEED_EMAILS
 
@@ -138,6 +139,19 @@ def delete_emails():
     Email.query.filter(Email.id.in_(data["ids"])).delete()
     db.session.commit()
     return "", 204
+
+
+@app.route("/ai/summarize/<thread_id>", methods=["POST"])
+def ai_summarize(thread_id):
+    try:
+        result = summarize_thread(thread_id)
+    except ValueError as exc:
+        return {"error": str(exc)}, 400
+
+    if result is None:
+        return {"error": f"thread not found: {thread_id}"}, 404
+
+    return result
 
 
 @app.route("/reset", methods=["POST"])
