@@ -36,11 +36,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # 安装依赖项
 pip install fastapi uvicorn requests mcp langchain-mcp-adapters langchain langchain-ollama
 ```
-
-2. Start the Task API
 2. 启动任务 API
-
-The FastAPI server is provided complete as reference. Start it first:
 FastAPI 服务器已完整提供作为参考。请先启动它：
 
 ```bash
@@ -50,13 +46,8 @@ uv run python api/app.py
 The API will run on http://localhost:8000. Keep this running in a separate terminal.
 API 将在 http://localhost:8000 上运行。请在单独的终端中保持其运行。
 
-3. Review the API Documentation
 3. 查看 API 文档
-
-Before implementing your MCP server, understand what endpoints are available:
 在实现 MCP 服务器之前，先了解有哪些可用的端点：
-
-GET /tasks - List all tasks
 GET /tasks - 列出所有任务
 
 POST /tasks - Create a new task
@@ -89,118 +80,49 @@ Task 1.1: Add the Tool Decorator
 The first function needs the decorator that makes it available as an MCP tool.
 第一个函数需要添加装饰器，使其作为 MCP 工具可用。
 
-What to do: Add the appropriate decorator to get_tasks()
 操作说明：为 get_tasks() 添加适当的装饰器
 
-Key concept: MCP servers use decorators to register functions as tools. Look at the other functions in the file to see the pattern.
+
 关键概念：MCP 服务器使用装饰器将函数注册为工具。查看文件中其他函数以了解模式。
-
-Task 1.2: Implement GET Request
 任务 1.2：实现 GET 请求
-
-Complete the get_tasks() function to fetch all tasks from the API.
 完成 get_tasks() 函数，从 API 获取所有任务。
-
-What to do:
 操作说明：
-
-Make an HTTP GET request to the tasks endpoint
 向 tasks 端点发送 HTTP GET 请求
-
-Check for errors with response.raise_for_status()
 使用 response.raise_for_status() 检查错误
-
-Return the JSON response
 返回 JSON 响应
 
-Key concept: MCP tools make HTTP requests to underlying APIs and return the results.
 关键概念：MCP 工具向底层 API 发送 HTTP 请求并返回结果。
-
-Task 1.3: Implement POST Request
 任务 1.3：实现 POST 请求
-
-Complete the create_task() function to create a new task.
 完成 create_task() 函数以创建新任务。
-
-What to do:
-操作说明：
-
-Make an HTTP POST request with the function parameters as JSON
 使用函数参数作为 JSON 发送 HTTP POST 请求
-
-Include all three parameters: title, description, completed
 包含全部三个参数：title、description、completed
-
-Return the JSON response
 返回 JSON 响应
-
-Key concept: POST requests send data in the request body as JSON.
 关键概念：POST 请求在请求体中以 JSON 格式发送数据。
-
-Task 1.4: Implement GET with Path Parameter
 任务 1.4：实现带路径参数的 GET 请求
-
-Complete the get_task() function to fetch a specific task by ID.
 完成 get_task() 函数，按 ID 获取特定任务。
 
-What to do:
+
 操作说明：
-
-Construct the URL with the task_id in the path
 在路径中包含 task_id 构造 URL
-
-Make the GET request
 发送 GET 请求
-
-Return the JSON response
 返回 JSON 响应
-
-Key concept: Path parameters are included in the URL using f-strings.
 关键概念：路径参数使用 f-string 包含在 URL 中。
-
-Task 1.5: Implement PUT Request
 任务 1.5：实现 PUT 请求
-
-Complete the update_task() function to update an existing task.
 完成 update_task() 函数以更新现有任务。
 
-What to do:
+
 操作说明：
-
-Make a PUT request with update_data as the JSON body
-以 update_data 作为 JSON 请求体发送 PUT 请求
-
-Include the task_id in the URL path
 在 URL 路径中包含 task_id
-
-Return the JSON response
 返回 JSON 响应
-
-Key concept: PUT requests update resources with partial or complete data.
 关键概念：PUT 请求使用部分或完整数据更新资源。
-
-Task 1.6: Implement DELETE Request
 任务 1.6：实现 DELETE 请求
-
-Complete the delete_task() function to remove a task.
 完成 delete_task() 函数以删除任务。
 
-What to do:
 操作说明：
-
-Make a DELETE request with the task_id in the URL path
 在 URL 路径中包含 task_id 发送 DELETE 请求
-
-Return the JSON response
 返回 JSON 响应
-
-Key concept: You've now implemented all CRUD operations through MCP tools!
 关键概念：你现在已经通过 MCP 工具实现了所有 CRUD 操作！
-
-Test Your MCP Server
 测试你的 MCP 服务器
-
-Once complete, test your server:
 完成后，测试你的服务器：
 
 ```bash
@@ -210,7 +132,6 @@ uv run python task_mcp_server.py
 The server should start without errors. You won't see much output yet - that's normal. The server is waiting for a client to connect.
 服务器应无错误启动。暂时不会看到太多输出——这是正常的。服务器正在等待客户端连接。
 
-Part 2: Build the MCP Client
 第二部分：构建 MCP 客户端
 
 Goal: Create a client that connects to your MCP server, retrieves tools, and enables conversational task management.
@@ -226,21 +147,16 @@ Configure the client to connect to your MCP server.
 配置客户端以连接到你的 MCP 服务器。
 
 What to do: Create a MultiServerMCPClient with the proper configuration dictionary.
-操作说明：使用正确的配置字典创建 MultiServerMCPClient。
-
-The configuration needs:
+操作说明：使用正确的配置字典创建 MultiServerMCPClient
 配置需要包含：
 
 A server name (e.g., "task-manager")
 服务器名称（例如 "task-manager"）
 
-Transport type: "stdio"
+
 传输类型："stdio"
 
-Command: Path to your Python interpreter in the virtual environment
 Command：虚拟环境中 Python 解释器的路径
-
-Args: List containing the path to your task_mcp_server.py file
 Args：包含 task_mcp_server.py 文件路径的列表
 
 Key concept: MCP clients connect to servers via stdio (standard input/output), launching the server as a subprocess.
