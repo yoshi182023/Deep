@@ -76,13 +76,9 @@ GenMail 包含：
 - 结构化输出（JSON、格式化文本或可展示数据）
 - 能在种子数据上正常运行
 
----
-
 
 
 ## 功能列表
-### 1. 线程摘要
-
 **难度：** 简单
 生成对话线程的简洁摘要。
 **输入：** 线程 ID
@@ -93,27 +89,14 @@ GenMail 包含：
 线程：phoenix-timeline-001
 摘要："David 询问了 Phoenix 发布时间表。Alex 确认了 4 月 15 日的目标，但指出了身份认证集成的风险。David 要求在周五董事会电话会前安排同步会议。"
 ```
-
-
-
 **成功标准：**
-
 - 涵盖关键参与者、主题和决策
 - 适用于数据库中的任意线程
 - 省略无关细节
 
-### 2. Unread Digest
-
 ### 2. 未读邮件摘要
-
 **Difficulty:** Easy
-
 **难度：** 简单
-
-Summarize all unread emails in a digest format.
-
-以摘要格式汇总所有未读邮件。
-
 **Input:** None (fetches unread emails)  
 **输入：** 无（自动获取未读邮件）
 
@@ -165,26 +148,12 @@ From Jennifer Walsh (1):
 - Highlights items requiring attention
 - 突出需要关注的事项
 
-### 3. Sender Topic Analysis
+
 
 ### 3. 发件人主题分析
-
-**Difficulty:** Medium
-
-**难度：** 中等
-
-Analyze all emails from a specific sender and identify topic clusters.
-
-分析特定发件人的所有邮件并识别主题聚类。
-
-**Input:** Email address  
+分析特定发件人的所有邮件并识别主题聚类
 **输入：** 邮箱地址
-
-**Output:** Topic clusters with examples  
 **输出：** 带示例的主题聚类
-
-**Example:**
-
 **示例：**
 
 ```
@@ -219,24 +188,11 @@ Topics:
    - 方案 B 使路线图延长 2 周
 ```
 
-**Success criteria:**
 
-**成功标准：**
 
-- Groups emails into topics
-- 将邮件按主题分组
-- Topics are specific
-- 主题具体明确
-- Shows representative examples
-- 展示代表性示例
-
-### 4. Stats Dashboard
 
 ### 4. 统计仪表盘
 
-**Difficulty:** Medium
-
-**难度：** 中等
 
 Generate inbox analytics beyond the basic `/stats` endpoint.
 
@@ -286,7 +242,6 @@ Threads:
 - 最近：Bug 升级（2 小时前）
 ```
 
-**Success criteria:**
 
 **成功标准：**
 
@@ -297,26 +252,12 @@ Threads:
 - Uses the data model effectively
 - 有效利用数据模型
 
-### 5. Commitment Tracker
+
 
 ### 5. 承诺追踪
 
-**Difficulty:** Hard
-
-**难度：** 困难
-
-Scan sent emails and extract commitments made to others.
-
 扫描已发送邮件并提取对他人的承诺。
-
-**Input:** None (scans sent emails)  
-**输入：** 无（扫描已发送邮件）
-
-**Output:** List of commitments with context  
 **输出：** 带上下文的承诺列表
-
-**Example:**
-
 **示例：**
 
 ```
@@ -524,11 +465,10 @@ Context:
 - Explains the classification
 - 解释分类依据
 
-### 8. Smart Reply Drafter
+
 
 ### 8. 智能回复起草
 
-**Difficulty:** Very Hard
 
 **难度：** 非常困难
 
@@ -542,7 +482,6 @@ Draft contextually appropriate email replies.
 **Output:** Draft reply  
 **输出：** 回复草稿
 
-**Example:**
 
 **示例：**
 
@@ -604,26 +543,14 @@ Alex
 - Could be sent with minor edits only
 - 仅需少量修改即可发送
 
-### 9. Proactive Inbox Surface
+
 
 ### 9. 主动收件箱提醒
 
 **Difficulty:** Very Hard
-
-**难度：** 非常困难
-
-Automatically surface items requiring attention when the user opens the app.
-
 用户打开应用时自动呈现需要关注的事项。
-
-**Input:** None (runs automatically)  
 **输入：** 无（自动运行）
-
-**Output:** Prioritized action list  
 **输出：** 优先级排序的行动列表
-
-**Example:**
-
 **示例：**
 
 ```
