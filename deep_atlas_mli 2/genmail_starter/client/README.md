@@ -299,8 +299,6 @@ Your Commitments:
 - Detecting implicit vs explicit commitments
 - 识别隐式与显式承诺
 
-**Success criteria:**
-
 **成功标准：**
 
 - Catches clear commitments ("I'll send", "I will", "I'll have")
@@ -309,8 +307,6 @@ Your Commitments:
 - 识别收件人和截止日期（如有提及）
 - Minimal false positives
 - 误报率最低
-
-### 6. Urgency Classifier
 
 ### 6. 紧急程度分类
 
@@ -344,32 +340,9 @@ Reasoning:
 - User replied within 17 minutes (fast response pattern)
 ```
 
-```
-邮件："URGENT: Data sync issue affecting Initech"
-紧急程度：高（9/10）
 
-推理：
-- 主题行包含 "URGENT"
-- 提及客户名称（Initech）——其他线程显示其为关键 beta 客户
-- 发件人为 Mike（支持负责人），很少升级问题
-- 在工作时间发送（非自动生成）
-- 用户在 17 分钟内回复（快速响应模式）
-```
 
-**Challenges:**
 
-**挑战：**
-
-- Urgency depends on sender, topic, timing
-- 紧急程度取决于发件人、主题、时间
-- Must distinguish real urgency from spam/"urgent" subject lines
-- 必须区分真实紧急与垃圾邮件/「紧急」主题行
-- Requires understanding relationships
-- 需要理解人物关系
-- Temporal factors (overdue vs just sent)
-- 时间因素（已逾期 vs 刚发送）
-
-**Success criteria:**
 
 **成功标准：**
 
@@ -380,7 +353,7 @@ Reasoning:
 - Handles false urgency patterns
 - 处理虚假紧急模式
 
-### 7. Thread State Classifier
+
 
 ### 7. 线程状态分类
 
