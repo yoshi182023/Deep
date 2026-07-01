@@ -6,6 +6,11 @@ from flask_cors import CORS
 from openai import APIError
 from agents.env import load_env_file
 from agents.summarizer import summarize_thread
+from agents.digest import digest_unread  # 功能 2：未读邮件摘要
+from agents.sender_topics import analyze_sender_topics  # 功能 3：发件人主题分析
+from agents.analytics import inbox_analytics  # 功能 4：统计仪表盘
+from agents.commitments import track_commitments  # 功能 5：承诺追踪
+from agents.urgency import classify_email_urgency  # 功能 6：紧急程度分类
 from models import db, Email
 from seeds import SEED_EMAILS
 
@@ -156,7 +161,7 @@ def delete_emails():
     db.session.commit()
     return "", 204
 
-
+#POST /ai/summarize/<thread_id> -> AI 功能：生成指定线程的摘要（后加）
 @app.route("/ai/summarize/<thread_id>", methods=["POST"])
 def ai_summarize(thread_id):
     """AI 功能：生成指定线程的摘要（后加）"""
@@ -173,6 +178,114 @@ def ai_summarize(thread_id):
 
     if result is None:
         return {"error": f"thread not found: {thread_id}"}, 404
+
+    return result
+
+
+# 功能 2：POST /ai/digest — 未读邮件摘要（按发件人分组）
+@app.route("/ai/digest", methods=["POST"])
+def ai_digest():
+    """AI 功能：未读邮件摘要（按发件人分组）"""
+    try:
+        return digest_unread()
+    except ValueError as exc:
+        return {"error": str(exc)}, 400
+    except APIError as exc:
+        # LLM API 调用失败（Key、配额等）
+        return {
+            "error": str(exc),
+            "type": "llm_api_error",
+            "hint": "Check API key billing/quota, or switch to Ollama for local inference.",
+        }, 502
+
+
+# 功能 3：POST /ai/sender/<sender> — 发件人主题聚类分析
+@app.route("/ai/sender/<path:sender>", methods=["POST"])
+def ai_sender_topics(sender):
+    """AI 功能：分析指定发件人的邮件主题聚类"""
+    try:
+        result = analyze_sender_topics(sender)
+    except ValueError as exc:
+        return {"error": str(exc)}, 400
+    except APIError as exc:
+        return {
+            "error": str(exc),
+            "type": "llm_api_error",
+            "hint": "Check API key billing/quota, or switch to Ollama for local inference.",
+        }, 502
+
+    if result is None:
+        return {"error": f"未找到发件人: {sender}"}, 404
+
+    return result
+
+
+# =============================================================================
+# 第四步：POST /ai/analytics — 统计仪表盘（收件箱智能分析）
+# -----------------------------------------------------------------------------
+# 无输入参数；调用 inbox_analytics()：
+#   - Python 先算事实（邮件量、最忙日、最长线程等）
+#   - LLM 再写成中文报告
+# 返回：total_emails / unread_count / thread_count / facts / report
+# =============================================================================
+@app.route("/ai/analytics", methods=["POST"])
+def ai_analytics():
+    """AI 功能 4：超越 /stats 的收件箱智能分析"""
+    try:
+        return inbox_analytics()
+    except ValueError as exc:
+        return {"error": str(exc)}, 400
+    except APIError as exc:
+        return {
+            "error": str(exc),
+            "type": "llm_api_error",
+            "hint": "Check API key billing/quota, or switch to Ollama for local inference.",
+        }, 502
+
+
+# =============================================================================
+# 第五步：POST /ai/commitments — 承诺追踪
+# -----------------------------------------------------------------------------
+# 扫描 pm@acme.com 发出的邮件，LLM 提取明确承诺（I'll / 我会 + 截止时间等）。
+# 返回：sent_email_count / commitment_count / commitments[] / report
+# =============================================================================
+@app.route("/ai/commitments", methods=["POST"])
+def ai_commitments():
+    """AI 功能 5：扫描已发送邮件并提取承诺"""
+    try:
+        return track_commitments()
+    except ValueError as exc:
+        return {"error": str(exc)}, 400
+    except APIError as exc:
+        return {
+            "error": str(exc),
+            "type": "llm_api_error",
+            "hint": "Check API key billing/quota, or switch to Ollama for local inference.",
+        }, 502
+
+
+# =============================================================================
+# 第六步：POST /ai/urgency/<email_id> — 紧急程度分类
+# -----------------------------------------------------------------------------
+# Python 先 gather_urgency_facts（时间、已回复、发件人历史、跨线程提及等），
+# LLM 输出 score / level / reasoning。不持久化，按需实时计算。
+# =============================================================================
+@app.route("/ai/urgency/<int:email_id>", methods=["POST"])
+def ai_urgency(email_id):
+    """AI 功能 6：分析单封邮件的紧急程度"""
+    try:
+        result = classify_email_urgency(email_id)
+    except ValueError as exc:
+        return {"error": str(exc)}, 400
+    except APIError as exc:
+        return {
+            "error": str(exc),
+            "type": "llm_api_error",
+            "hint": "Check API key billing/quota, or switch to Ollama for local inference.",
+        }, 502
+
+    if result is None:
+        return {"error": f"邮件不存在: {email_id}"}, 404
 
     return result
 
@@ -199,3 +312,4 @@ def reset_database():
 
 if __name__ == "__main__":
     app.run(debug=True)
+

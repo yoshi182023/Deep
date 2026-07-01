@@ -1,7 +1,7 @@
 from agents.client import chat_completion
 from models import Email
 
-SYSTEM_PROMPT = """You summarize email conversation threads in 2-3 concise sentences.
+SYSTEM_PROMPT = """You summarize email conversation threads in 2-3 concise sentences in Chinese.
 Capture key participants, topics, and decisions. Omit irrelevant details."""
 
 
