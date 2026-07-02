@@ -8,7 +8,7 @@ from models import Email
 PRIMARY_USER = "pm@acme.com"
 
 # 发给 LLM 的系统提示：要求中文输出、按发件人分组、bullet 格式
-SYSTEM_PROMPT = """请用中文生成未读邮件摘要。
+SYSTEM_PROMPT = """用中文生成未读邮件摘要。
 按发件人分组，每组下列出简洁要点（每条一行，以 - 开头）。
 必须涵盖输入中的每一封未读邮件，突出紧急的事项。
 使用如下格式：

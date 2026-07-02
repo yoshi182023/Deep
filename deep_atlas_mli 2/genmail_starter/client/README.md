@@ -370,9 +370,6 @@ Determine the current state of a thread.
 
 **Output:** State classification + explanation  
 **输出：** 状态分类 + 说明
-
-**Example:**
-
 **示例：**
 
 ```
@@ -399,24 +396,23 @@ Context:
 - 在看到需求前无法进行范围界定
 ```
 
-**Possible states:**
 
 **可能的状态：**
 
-- ACTIVE — Ongoing discussion
+
 - ACTIVE — 讨论进行中
-- WAITING_ON_YOU — You owe a response
+
 - WAITING_ON_YOU — 你需要回复
-- WAITING_ON_THEM — Someone else needs to reply
+
 - WAITING_ON_THEM — 等待他人回复
-- BLOCKED — Can't proceed without external input
+
 - BLOCKED — 缺少外部输入无法推进
-- RESOLVED — Conversation concluded
+
 - RESOLVED — 对话已结束
-- FYI — No action needed
+
 - FYI — 无需操作
 
-**Challenges:**
+
 
 **挑战：**
 
@@ -427,7 +423,7 @@ Context:
 - Silence is ambiguous (resolved? ghosted? waiting?)
 - 沉默具有歧义（已解决？被忽视？等待中？）
 
-**Success criteria:**
+
 
 **成功标准：**
 
@@ -600,11 +596,7 @@ Inbox Intelligence (unprompted):
 
 **难度：** 非常困难
 
-Find all emails mentioning a topic and synthesize insights across threads.
-
 查找提及某主题的所有邮件并跨线程综合洞察。
-
-**Input:** Topic or keyword  
 **输入：** 主题或关键词
 
 **Output:** Synthesis report  
@@ -868,7 +860,6 @@ Phoenix 发布 — 跨线程综合：
 - [DeepEval](https://github.com/confident-ai/deepeval) — LLM evaluation with custom metrics and test cases
 - [DeepEval](https://github.com/confident-ai/deepeval) — 带自定义指标和测试用例的 LLM 评估
 
-**Evaluation Strategy:**
 
 **评估策略：**
 
@@ -929,8 +920,6 @@ Features should:
   - 一个失败案例及根因
   - Potential next steps
   - 潜在后续步骤
-
-### Evaluation Criteria
 
 ### 评估标准
 

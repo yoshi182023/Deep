@@ -6,11 +6,20 @@ from flask_cors import CORS
 from openai import APIError
 from agents.env import load_env_file
 from agents.summarizer import summarize_thread
-from agents.digest import digest_unread  # 功能 2：未读邮件摘要
+from agents.digest import digest_unread 
+# 功能 2：未读邮件摘要
 from agents.sender_topics import analyze_sender_topics  # 功能 3：发件人主题分析
 from agents.analytics import inbox_analytics  # 功能 4：统计仪表盘
 from agents.commitments import track_commitments  # 功能 5：承诺追踪
 from agents.urgency import classify_email_urgency  # 功能 6：紧急程度分类
+from agents.thread_state import classify_thread_state  # 功能 7：线程状态分类
+from agents.inbox_intelligence import (  # 功能 9【LangGraph】
+    proactive_inbox,
+    resume_proactive_inbox,
+    start_proactive_inbox,
+)
+from agents.cross_thread import synthesize_topic  # 功能 10：跨线程综合
+from agents.draft_reply import resume_draft_reply, start_draft_reply  # 功能 8：智能回复（【LangGraph】唯一入口）
 from models import db, Email
 from seeds import SEED_EMAILS
 
@@ -288,6 +297,152 @@ def ai_urgency(email_id):
         return {"error": f"邮件不存在: {email_id}"}, 404
 
     return result
+
+
+# =============================================================================
+# 第七步：POST /ai/thread-state/<thread_id> — 线程状态分类
+# -----------------------------------------------------------------------------
+# Python 先 gather_thread_state_facts，LLM 输出 state / blocking_party / context。
+# 不持久化；功能 9「停滞对话」将复用 classify_thread_state()。
+# =============================================================================
+@app.route("/ai/thread-state/<thread_id>", methods=["POST"])
+def ai_thread_state(thread_id):
+    """AI 功能 7：分析邮件线程当前状态"""
+    try:
+        result = classify_thread_state(thread_id)
+    except ValueError as exc:
+        return {"error": str(exc)}, 400
+    except APIError as exc:
+        return {
+            "error": str(exc),
+            "type": "llm_api_error",
+            "hint": "Check API key billing/quota, or switch to Ollama for local inference.",
+        }, 502
+
+    if result is None:
+        return {"error": f"线程不存在: {thread_id}"}, 404
+
+    return result
+
+
+# =============================================================================
+# 第九步：主动收件箱提醒 — 【LangGraph 并行 gather + interrupt 确认】
+# -----------------------------------------------------------------------------
+# POST /ai/inbox-intelligence         → 并行 gather，interrupt 返回 run_id + 待办列表
+# POST /ai/inbox-intelligence/resume  → { run_id, action: confirm_all|skip }
+# body.auto_confirm=true 时一键跑完（兼容旧行为）
+# =============================================================================
+@app.route("/ai/inbox-intelligence", methods=["POST"])
+def ai_inbox_intelligence():
+    """AI 功能 9：LangGraph 主动收件箱（默认在待办确认处 interrupt）"""
+    data = request.get_json(silent=True) or {}
+    try:
+        if data.get("auto_confirm"):
+            return proactive_inbox()
+        return start_proactive_inbox()
+    except ValueError as exc:
+        return {"error": str(exc)}, 400
+    except APIError as exc:
+        return {
+            "error": str(exc),
+            "type": "llm_api_error",
+            "hint": "Check API key billing/quota, or switch to Ollama for local inference.",
+        }, 502
+
+
+@app.route("/ai/inbox-intelligence/resume", methods=["POST"])
+def ai_inbox_intelligence_resume():
+    """AI 功能 9：LangGraph Command(resume) — 用户确认待办后生成报告"""
+    data = request.get_json(silent=True) or {}
+    run_id = data.get("run_id")
+    action = data.get("action", "confirm_all")
+    filtered_items = data.get("filtered_items")
+
+    if not run_id:
+        return {"error": "需要 run_id"}, 400
+
+    try:
+        return resume_proactive_inbox(run_id, action, filtered_items)
+    except ValueError as exc:
+        return {"error": str(exc)}, 400
+    except APIError as exc:
+        return {
+            "error": str(exc),
+            "type": "llm_api_error",
+            "hint": "Check API key billing/quota, or switch to Ollama for local inference.",
+        }, 502
+
+
+# =============================================================================
+# 第十步：POST /ai/synthesize — 跨线程综合【LangGraph: search→synthesize→reflect】
+# -----------------------------------------------------------------------------
+# 请求体：{ "topic": "Phoenix" }；搜索相关邮件并生成综合报告。
+# =============================================================================
+@app.route("/ai/synthesize", methods=["POST"])
+def ai_synthesize():
+    """AI 功能 10：LangGraph 跨线程综合（search → synthesize → reflect）"""
+    data = request.json or {}
+    topic = data.get("topic", "")
+    try:
+        return synthesize_topic(topic)
+    except ValueError as exc:
+        return {"error": str(exc)}, 400
+    except APIError as exc:
+        return {
+            "error": str(exc),
+            "type": "llm_api_error",
+            "hint": "Check API key billing/quota, or switch to Ollama for local inference.",
+        }, 502
+
+
+# =============================================================================
+# 第八步：智能回复起草 — 【LangGraph + Human-in-the-Loop】
+# -----------------------------------------------------------------------------
+# 全项目 LangGraph 路由：功能 8 draft_reply、功能 9 inbox_intelligence、功能 10 cross_thread
+# POST /ai/draft-reply/<thread_id>  → graph.invoke()，在 interrupt 暂停，返回 run_id
+# POST /ai/draft-reply/resume       → graph.invoke(Command(resume=...)) 用户审批后续跑
+# =============================================================================
+@app.route("/ai/draft-reply/<thread_id>", methods=["POST"])
+def ai_draft_reply_start(thread_id):
+    """AI 功能 8：LangGraph 生成草稿，等待用户审批（interrupt）"""
+    try:
+        result = start_draft_reply(thread_id)
+    except ValueError as exc:
+        return {"error": str(exc)}, 400
+    except APIError as exc:
+        return {
+            "error": str(exc),
+            "type": "llm_api_error",
+            "hint": "Check API key billing/quota, or switch to Ollama for local inference.",
+        }, 502
+
+    if result is None:
+        return {"error": f"线程不存在: {thread_id}"}, 404
+
+    return result
+
+
+@app.route("/ai/draft-reply/resume", methods=["POST"])
+def ai_draft_reply_resume():
+    """AI 功能 8：LangGraph Command(resume) — 批准/编辑后发送，或 reject 取消"""
+    data = request.json or {}
+    run_id = data.get("run_id")
+    action = data.get("action")
+    body = data.get("body")
+
+    if not run_id or not action:
+        return {"error": "需要 run_id 和 action"}, 400
+
+    try:
+        return resume_draft_reply(run_id, action, body)
+    except ValueError as exc:
+        return {"error": str(exc)}, 400
+    except APIError as exc:
+        return {
+            "error": str(exc),
+            "type": "llm_api_error",
+            "hint": "Check API key billing/quota, or switch to Ollama for local inference.",
+        }, 502
 
 
 @app.route("/reset", methods=["POST"])

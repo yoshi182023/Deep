@@ -5,6 +5,7 @@ import { API_BASE } from "@/constants"
 import { DevControls } from "@/components/DevControls"
 import { EmailList } from "@/components/EmailList"
 import { EmailViewer } from "@/components/EmailViewer"
+import { InboxIntelligence } from "@/components/InboxIntelligence"
 
 function App() {
   const [emails, setEmails] = useState<Email[]>([])  // 全部邮件
@@ -54,6 +55,7 @@ function App() {
   return (
     <div className="flex flex-col h-screen">
       <DevControls onReset={resetDatabase} emails={emails} onEmailCreated={fetchEmails} />
+      <InboxIntelligence />
       <div className="flex flex-1 min-h-0">
         <EmailList
           emails={emails}

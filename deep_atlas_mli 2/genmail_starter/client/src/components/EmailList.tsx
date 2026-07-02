@@ -67,6 +67,17 @@ interface CommitmentTracker {
   report: string
 }
 
+// =============================================================================
+// 第十步：/ai/synthesize — 【LangGraph】search → synthesize → reflect
+// -----------------------------------------------------------------------------
+interface TopicSynthesis {
+  topic: string
+  email_count: number
+  thread_count: number
+  thread_ids: string[]
+  report: string
+}
+
 interface EmailListProps {
   emails: Email[]
   selectedEmail: Email | null
@@ -91,6 +102,12 @@ export function EmailList({ emails, selectedEmail, onSelect, onEmailSent }: Emai
   const [commitmentsLoading, setCommitmentsLoading] = useState(false)
   const [commitments, setCommitments] = useState<CommitmentTracker | null>(null)
   const [commitmentsError, setCommitmentsError] = useState<string | null>(null)
+  // --- 第十步：跨线程综合 ---
+  const [synthOpen, setSynthOpen] = useState(false)
+  const [synthLoading, setSynthLoading] = useState(false)
+  const [synthTopic, setSynthTopic] = useState("Phoenix")
+  const [synthesis, setSynthesis] = useState<TopicSynthesis | null>(null)
+  const [synthError, setSynthError] = useState<string | null>(null)
   const [recipient, setRecipient] = useState("")
   const [subject, setSubject] = useState("")
   const [body, setBody] = useState("")
@@ -167,6 +184,40 @@ export function EmailList({ emails, selectedEmail, onSelect, onEmailSent }: Emai
       })
   }
 
+  // 第十步：调用 POST /ai/synthesize，跨线程综合主题
+  const handleSynthesize = () => {
+    const topic = synthTopic.trim()
+    if (!topic) {
+      setSynthError("请输入主题关键词")
+      return
+    }
+
+    setSynthOpen(true)
+    setSynthLoading(true)
+    setSynthesis(null)
+    setSynthError(null)
+
+    fetch(`${API_BASE}/ai/synthesize`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ topic }),
+    })
+      .then(async (res) => {
+        const data = await res.json()
+        if (!res.ok) {
+          const hint = data.hint ? ` ${data.hint}` : ""
+          throw new Error((data.error || "跨线程综合失败") + hint)
+        }
+        setSynthesis(data as TopicSynthesis)
+      })
+      .catch((err: Error) => {
+        setSynthError(err.message || "跨线程综合失败")
+      })
+      .finally(() => {
+        setSynthLoading(false)
+      })
+  }
+
   // 以当前用户身份发送新邮件（新线程）
   const handleSend = () => {
     fetch(`${API_BASE}/emails`, {
@@ -198,6 +249,10 @@ export function EmailList({ emails, selectedEmail, onSelect, onEmailSent }: Emai
           {/* 第五步：承诺追踪按钮 */}
           <Button variant="outline" size="sm" onClick={handleCommitments} disabled={commitmentsLoading}>
             {commitmentsLoading ? <Loader2 className="size-4 animate-spin" /> : "承诺追踪"}
+          </Button>
+          {/* 第十步：跨线程综合按钮 */}
+          <Button variant="outline" size="sm" onClick={handleSynthesize} disabled={synthLoading}>
+            {synthLoading ? <Loader2 className="size-4 animate-spin" /> : "跨线程综合"}
           </Button>
           {/* 功能 2：摘要结果抽屉 */}
           <Drawer direction="right" open={digestOpen} onOpenChange={setDigestOpen}>
@@ -296,6 +351,52 @@ export function EmailList({ emails, selectedEmail, onSelect, onEmailSent }: Emai
               <DrawerFooter>
                 {commitmentsError && (
                   <Button variant="outline" onClick={handleCommitments} disabled={commitmentsLoading}>
+                    重试
+                  </Button>
+                )}
+                <DrawerClose asChild>
+                  <Button variant="outline">关闭</Button>
+                </DrawerClose>
+              </DrawerFooter>
+            </DrawerContent>
+          </Drawer>
+          {/* 第十步：跨线程综合结果抽屉 */}
+          <Drawer direction="right" open={synthOpen} onOpenChange={setSynthOpen}>
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>跨线程综合</DrawerTitle>
+              </DrawerHeader>
+              <div className="flex flex-col gap-4 p-4">
+                <Input
+                  placeholder="主题关键词，如 Phoenix"
+                  value={synthTopic}
+                  onChange={(e) => setSynthTopic(e.target.value)}
+                />
+                {synthLoading && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="size-4 animate-spin" />
+                    正在综合相关线程...
+                  </div>
+                )}
+                {synthError && (
+                  <p className="text-sm text-destructive">{synthError}</p>
+                )}
+                {synthesis && (
+                  <>
+                    <p className="text-sm whitespace-pre-wrap">{synthesis.report}</p>
+                    <p className="text-xs text-muted-foreground">
+                      主题「{synthesis.topic}」· {synthesis.email_count} 封邮件 ·{" "}
+                      {synthesis.thread_count} 个线程
+                    </p>
+                  </>
+                )}
+              </div>
+              <DrawerFooter>
+                <Button onClick={handleSynthesize} disabled={synthLoading}>
+                  生成报告
+                </Button>
+                {synthError && (
+                  <Button variant="outline" onClick={handleSynthesize} disabled={synthLoading}>
                     重试
                   </Button>
                 )}
