@@ -42,28 +42,15 @@ Merge it with your existing deep_atlas environment by installing new dependencie
 Create a new virtualenv for this exercise itself using uv sync.
 或使用 uv sync 为本练习单独创建一个新的虚拟环境。
 
-Build an agentic system with tool use and error recovery.
-构建一个支持工具调用与错误恢复的智能体系统。
 
-Objectives:
+构建一个支持工具调用与错误恢复的智能体系统。
 目标：
 
-Implement a SQLite-based storage layer with dynamic queries.
 实现一个基于 SQLite 且支持动态查询的存储层。
-
-Define tools for LLM function calling using Ollama.
 使用 Ollama 定义用于 LLM 函数调用的工具。
-
-Build a multi-turn conversation loop with memory.
-构建一个带记忆的多轮对话循环。
-
-Implement retry logic for error recovery.
+**构建一个带记忆的多轮对话循环**
 实现用于错误恢复的重试逻辑。
-
-Generate structured outputs on demand.
 按需生成结构化输出。
-
-Project Goals
 项目目标
 
 Create an expense tracking assistant that uses Ollama's function calling capabilities to help users manage their expenses through natural conversation.

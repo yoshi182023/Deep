@@ -4,6 +4,8 @@ import json
 
 storage = ExpenseStorage()
 
+# 主要模块 1：tools（函数调用 schema）
+# 作用：把可调用工具及其参数结构告诉 Ollama，让模型能返回 tool_calls。
 tools = [
     {
         "type": "function",
@@ -96,6 +98,8 @@ tools = [
 ]
 
 
+# 主要函数 1：execute_tool
+# 作用：将模型返回的 tool_name 分发到真实存储方法（增删改查）。
 def execute_tool(tool_name: str, arguments: dict) -> dict:
     try:
         if tool_name == "add_expense":
@@ -113,10 +117,12 @@ def execute_tool(tool_name: str, arguments: dict) -> dict:
 
 
 def chat(user_message: str, conversation_history: list, max_retries: int = 3) -> str:
+    # 主要函数 2：chat
+    # 作用：处理单轮对话，执行工具调用，并在失败时做重试恢复。
     conversation_history.append({"role": "user", "content": user_message})
 
     response = ollama.chat(
-        model="llama3.1:8b", messages=conversation_history, tools=tools
+        model="llama3.2:latest", messages=conversation_history, tools=tools
     )
 
     conversation_history.append(response["message"])
@@ -159,7 +165,7 @@ def chat(user_message: str, conversation_history: list, max_retries: int = 3) ->
                     )
 
                     retry_response = ollama.chat(
-                        model="llama3.1:8b", messages=conversation_history, tools=tools
+                        model="llama3.2:latest", messages=conversation_history, tools=tools
                     )
                     conversation_history.append(retry_response["message"])
 
@@ -171,7 +177,7 @@ def chat(user_message: str, conversation_history: list, max_retries: int = 3) ->
                         break
 
         final_response = ollama.chat(
-            model="llama3.1:8b", messages=conversation_history, tools=tools
+            model="llama3.2:latest", messages=conversation_history, tools=tools
         )
         conversation_history.append(final_response["message"])
         return final_response["message"]["content"]
@@ -180,6 +186,8 @@ def chat(user_message: str, conversation_history: list, max_retries: int = 3) ->
 
 
 def main():
+    # 主要函数 3：main
+    # 作用：CLI 入口，初始化系统提示并维护多轮会话循环。
     print("Expense Tracker - Type 'quit' to exit\n")
     conversation_history = [
         {

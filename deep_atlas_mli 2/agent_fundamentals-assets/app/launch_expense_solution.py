@@ -3,7 +3,7 @@ import pathlib
 import runpy
 import sys
 
-base = pathlib.Path("/workspaces/Deep/deep_atlas_mli 2/agent_fundamentals-assets/app")
+base = pathlib.Path(__file__).resolve().parent
 spec = importlib.util.spec_from_file_location("storage", base / "storage.solution.py")
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
